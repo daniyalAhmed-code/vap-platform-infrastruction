@@ -1,0 +1,469 @@
+openapi: 3.0.0
+servers:
+  - url: https://apiplatform.com/1.0.0
+info:
+  description: This is a the OpenAPI 3.0 specification of the API Integration Platform.
+  version: 1.0.0
+  title: API Integration Platform
+tags:
+  - name: contact
+    description: Contact
+  - name: devicetype
+    description: Device Type
+x-amazon-apigateway-request-validators:
+  full:
+    validateRequestBody: true
+    validateRequestParameters: true
+  body-only:
+    validateRequestBody: true
+    validateRequestParameters: false
+paths:
+  #  /contact:
+  #    post:
+  #      x-amazon-apigateway-request-validator: full
+  #      tags:
+  #        - contact
+  #      summary: create a contact
+  #      description: Add a new contact
+  #      operationId: createContact
+  #      requestBody:
+  #        description: Create a new contact
+  #        required: true
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: '#/components/schemas/Contact'
+  #      responses:
+  #        '200':
+  #          description: Successful operation
+  #          content:
+  #            application/json:
+  #              schema:
+  #                $ref: '#/components/schemas/Contact'
+  #        '400':
+  #          description: Invalid input, object invalid
+  #        '409':
+  #          description: An existing contact already exists
+  #    get:
+  #      x-amazon-apigateway-request-validator: full
+  #      tags:
+  #        - contact
+  #      summary: List of contacts by first and last name
+  #      description: Multiple Contacts according to defined filters
+  #      operationId: listContacts
+  #      parameters:
+  #        - name: first_name
+  #          in: query
+  #          required: false
+  #          description: First name of the contact considered for filter
+  #          schema:
+  #            type: string
+  #        - name: last_name
+  #          in: query
+  #          required: false
+  #          description: Last name of the contact considered for filter
+  #          schema:
+  #            type: string
+  #      responses:
+  #        '200':
+  #          description: successful operation
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: array
+  #                items:
+  #                  $ref: '#/components/schemas/Contact'
+  #        '400':
+  #          description: Invalid status value
+  #  /contact/{contact_id}:
+  #    x-amazon-apigateway-request-validator: full
+  #    get:
+  #      tags:
+  #        - contact
+  #      summary: Find Contact by ID
+  #      description: Return a single Contact
+  #      operationId: getContact
+  #      parameters:
+  #        - name: contact_id
+  #          in: path
+  #          description: Unique identification of Contact to return.
+  #          required: true
+  #          schema:
+  #            type: integer
+  #            format: int64
+  #      responses:
+  #        '200':
+  #          description: Successful operation
+  #          content:
+  #            application/json:
+  #              schema:
+  #                $ref: '#/components/schemas/Contact'
+  #        '400':
+  #          description: Invalid ID supplied
+  #        '404':
+  #          description: Contact not found
+  #    patch:
+  #      x-amazon-apigateway-request-validator: full
+  #      tags:
+  #        - contact
+  #      summary: Update an existing contact
+  #      description: Update an existing contact by ID
+  #      operationId: updateContact
+  #      parameters:
+  #        - name: contact_id
+  #          in: path
+  #          description: Id of the contact that need to be updated
+  #          required: true
+  #          schema:
+  #            type: integer
+  #      requestBody:
+  #       description: Updated an existing Contact
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/Contact'
+  #      responses:
+  #        '200':
+  #          description: Successful operation
+  #          content:
+  #            application/json:
+  #              schema:
+  #                $ref: '#/components/schemas/Contact'
+  #        '400':
+  #          description: Invalid ID supplied
+  #        '404':
+  #          description: Contact not found
+  #        '405':
+  #          description: Validation exception
+  #    delete:
+  #      x-amazon-apigateway-request-validator: full
+  #      tags:
+  #        - contact
+  #      summary: Delete a Contact
+  #      operationId: deleteContact
+  #      parameters:
+  #        - name: contact_id
+  #          in: path
+  #          description: Contact ID to delete
+  #          required: true
+  #          schema:
+  #            type: integer
+  #            format: int64
+  #      responses:
+  #        '400':
+  #          description: Invalid Contact Id informed
+  #        '404':
+  #          description: Contact not found
+  /devicetype:
+    post:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: ${EXECUTION_ROLE_ARN}
+        requestTemplates:
+          application/json: |-
+            #set($allParams = $input.params())
+            {
+              "body-json" : {
+                "Name" : $input.json('device_type_name'),
+                "sitetracker__Primary_UoM__c" : $input.json('primary_uom'),
+                "sitetracker__Category__c" : $input.json('category'),
+                "sitetracker__Sub_Category__c" : $input.json('subcategory'),
+                "sitetracker__Type__c" : $input.json('type'),
+                "Sub_type__c" : $input.json('subtype'),
+                "Available_for_Use__c" : $input.json('status'),
+                "Begin_of_Life__c" : $input.json('begin_of_life'),
+                "End_of_Life__c" : $input.json('end_of_life'),
+                "End_of_Service__c" : $input.json('end_of_service'),
+                "sitetracker__Weight__c" : $input.json('dimension_weight'),
+                "sitetracker__Width__c" : $input.json('dimension_width'),
+                "sitetracker__Height__c" : $input.json('dimension_height'),
+                "sitetracker__Length__c" : $input.json('dimension_length'),
+                "sitetracker__Dimensions_Unit__c" : $input.json('dimensions_unit'),
+                "Maximum_Power_Consumption__c" : $input.json('power_consumption'),
+                "Cooling_Capacity__c" : $input.json('cooling_capacity')
+              },
+              "params" : {
+                #foreach($type in $allParams.keySet())
+                    #set($params = $allParams.get($type))
+                "$type" : {
+                    #foreach($paramName in $params.keySet())
+                    "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                        #if($foreach.hasNext),#end
+                    #end
+                }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "arn:aws:secretsmanager:eu-central-1:730274447902:secret:/SiteTracker/Credentials-S9nMTK"
+              }
+            }
+        responses:
+          default:
+            statusCode: "201"
+            responseTemplates:
+              application/json: |-
+                #set($allParams = $input.params())
+                {
+                 ##  "body-json" : $input.json('$')
+                  "device_type_id": $input.json('id')
+                }
+          "409":
+            statusCode: "409"
+            responseTemplates:
+              application/json: |-
+                #set($allParams = $input.params())
+                {
+                  "error_message": $input.json('error_message')
+                }
+        passthroughBehavior: when_no_templates
+      tags:
+        - devicetype
+      summary: Create a Device Type
+      description: Add a new Device Type
+      operationId: createDeviceType
+      requestBody:
+        description: Create a new Device Type
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceType"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device_type_id:
+                    description: Unique ID
+                    type: string
+                    minLength: 1
+                    maxLength: 80
+        "400":
+          description: Invalid input, object invalid
+        "409":
+          description: An existing Device Type already exists
+#    get:
+#      tags:
+#        - devicetype
+#      summary: List of all Device Types
+#      description: All Device Types
+#      operationId: listDeviceTypes
+#      responses:
+#        '200':
+#          description: successful operation
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/DeviceType'
+#        '400':
+#          description: Invalid status value
+#  /devicetype/{device_type_id}:
+#    patch:
+#      tags:
+#        - devicetype
+#      summary: Update an existing Device Type
+#      description: Update an existing Device Type by ID
+#      operationId: updateDeviceType
+#      parameters:
+#        - name: device_type_id
+#          in: path
+#          description: Id of the device type that need to be updated
+#          required: true
+#          schema:
+#            type: string
+#      requestBody:
+#       description: Updated an existing Device Type
+#       required: true
+#       content:
+#         application/json:
+#           schema:
+#             $ref: '#/components/schemas/DeviceType'
+#      responses:
+#        '200':
+#          description: Successful operation
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/DeviceType'
+#        '400':
+#          description: Invalid ID supplied
+#        '404':
+#          description: Device Type not found
+#        '405':
+#          description: Validation exception
+components:
+  schemas:
+    Contact:
+      type: object
+      required:
+        - contact_id
+        - tims_site_id
+        - local_market_site_id
+        - first_name
+        - last_name
+      properties:
+        contact_id:
+          type: integer
+          format: int64
+          example:
+        tims_site_id:
+          type: string
+          example:
+        local_market_site_id:
+          type: string
+          example:
+        first_name:
+          type: string
+          example:
+        last_name:
+          type: string
+          example:
+        telephone:
+          type: string
+          example:
+        mobile_number:
+          type: string
+          example:
+        company_name:
+          type: string
+          example:
+        type_of_contact:
+          type: string
+          example:
+        postcode:
+          type: string
+          example:
+        city:
+          type: string
+          example:
+        street_address_1:
+          type: string
+          example:
+    DeviceType:
+      type: object
+      required:
+        - device_type_id
+        - primary_uom
+        - category
+        - sub_category
+        - type
+        - subtype
+        - status
+      properties:
+        device_type_name:
+          description: Unique Name
+          type: string
+          minLength: 1
+          maxLength: 80
+          example:
+        primary_uom:
+          description: Unit of measure used when the item is consumed
+          type: string
+          enum:
+            - Each
+            - Box
+            - Feet
+            - Meters
+            - Hours
+            - Days
+          example: Each
+        category:
+          description: Grouping of similar Items, enabling filtering and searching
+          type: string
+          example: Tower
+        sub_category:
+          description: Grouping within the parent category
+          type: string
+          example: Concrete Tower
+        type:
+          description: The type of Item. Only Material and Tool/Equipment can be made Available for Receipt and require a Usage Type and Tracking Method. Other Types (Labor, Service, Expense) cannot use those fields
+          type: string
+          enum:
+            - Material
+            - Tool/Equipment
+            - Labor
+            - Service
+            - Expense
+            - Standard System
+          example: Material
+        subtype:
+          description: Optional field that falls within the hierarchy of the "Type" chosen for this record
+          type: string
+          maxLength: 155
+          example:
+        status:
+          description: Indicates whether the item is available for use, or whether it is available for use under special permission from the lifecycle manager
+          type: string
+          enum:
+            - Yes
+            - No
+            - Yes with confirmation from Lifecycle Manager
+          example:
+        begin_of_life:
+          description: Date this item was manufactured or certificate
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+        end_of_life:
+          description: The expiration date of this item
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+        end_of_service:
+          description: Date that the item has been discontinued. End of Service of this item. If applicable
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+        dimension_weight:
+          description: The weight of the item in kilograms. Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example:
+        dimension_width:
+          description: The Width of the item. Width, Height, Depth and Diameter need to have the same dimension unit, as fixed in the field "General Dimensions Unit". Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example:
+        dimension_height:
+          description: The Height of the item. Height, Width, Depth and Diameter need to have the same dimension unit, as fixed in the field "General Dimensions Unit". Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example:
+        dimension_length:
+          description: Length of the Item (using Dimensions Unit). Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example:
+        dimension_unit:
+          description: The unit of measure for the dimensions of the items fields height, width, and depth
+          type: string
+          enum:
+            - in
+            - ft
+            - mn
+            - cm
+            - m
+          example: cm
+        power_consumption:
+          description: Maximum power consumption of an item (in Watt) for calculation of total power supply and total heat load. Number (12 int, 2 decimal)
+          type: integer
+          format: double
+          example:
+        cooling:
+          description: TGE cooling capacity of the item in British Temperature Unit (BTU - 1 Watt = 0,29351 BTU). Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example:
