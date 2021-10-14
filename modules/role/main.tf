@@ -263,3 +263,27 @@ resource "aws_iam_role" "api_key_authoriser_invocation_role" {
 }
 EOF
 }
+
+resource "aws_iam_role" "cognito_sms_caller_role" {
+  name               = "${var.RESOURCE_PREFIX}-api-key-authoriser_role"
+  assume_role_policy = <<EOF
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cognito-idp.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+     }
+  ]
+}
+EOF
+}
+
+
+
+

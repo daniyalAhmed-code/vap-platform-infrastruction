@@ -16,6 +16,12 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
       sms_message   = "<p><b>Username:</b> {username} <br><b>Temporary Password</b> {####}</p>"
     }
   }
+  mfa_configuration = "OPTIONAL"
+  sms_configuration {
+    external_id    = "${var.RESOURCE_PREFIX}-SMS-ROLE"
+    sns_caller_arn = var.COGNITO_SMS_CALLER_ROLE
+  }
+
 
   email_verification_subject = "Developer Portal - Invitation"
   email_verification_message = "'<h2>Developer Portal</h2><p>Your verification code is <b>{####}</b></p>'"
@@ -28,9 +34,9 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
     post_authentication = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostAuthenticationTriggerFn"
   }
   password_policy {
-    minimum_length    = 12
-    require_lowercase = true
-    require_numbers   = true
+    minimum_length                   = 12
+    require_lowercase                = true
+    require_numbers                  = true
     temporary_password_validity_days = 7
   }
   schema {
@@ -38,6 +44,16 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
     attribute_data_type = "String"
     mutable             = false    # false for "sub"
     required            = true     # true for "sub"
+    string_attribute_constraints { # if it is a string
+      min_length = 1               # 10 for "birthdate"
+      max_length = 2048            # 10 for "birthdate"
+    }
+  }
+  schema {
+    name                = "phone_number"
+    attribute_data_type = "String"
+    mutable             = false    # false for "sub"
+    required            = false    # true for "sub"
     string_attribute_constraints { # if it is a string
       min_length = 1               # 10 for "birthdate"
       max_length = 2048            # 10 for "birthdate"

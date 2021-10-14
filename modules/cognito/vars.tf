@@ -17,3 +17,4 @@ variable "COGNITO_USER_POOL" {}
 variable "REGISTERED_GROUP_NAME" {}
 variable "ADMIN_GROUP_NAME" {}
 variable "COGNITO_ADMIN_GROUP_DESCRIPTION" {}
+variable "COGNITO_SMS_CALLER_ROLE" {}

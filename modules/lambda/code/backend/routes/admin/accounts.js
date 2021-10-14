@@ -52,7 +52,7 @@ exports.post = async (req, res) => {
       'any.required': `"last name" is a required field`
     }),
 
-    targetPhoneNumber: Joi.string().regex(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/).required().messages({
+    targetPhoneNumber: Joi.string().regex(/^[\+]?[0-9]{3}[0-9]{3}[-\s\.]?[0-9]{4,6}$/).required().messages({
       'string.base': `"phone number" should be a type of 'text'`,
       'string.empty': `"phone number" cannot be an empty field`,
       'string.min': `"phone number" should have a minimum length of 9`,
@@ -64,11 +64,12 @@ exports.post = async (req, res) => {
     targetCallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
-    targetCallBackAuth: Joi.string().required().messages({
-      'string.empty': `"callback auth" cannot be an empty field`
-    }),
-    targetMno: Joi.string().required().valid(['Vodafone', "One_Telecomunications", "Orange", "Telefónia"]),
-    targetMnoLocation: Joi.string().required().valid(['Ireland', "Czech_Republic", "Greece", "Hungary", "Italy", "Portugal", "Romania", "Spain", "United_Kingdom"]),
+    type: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
+    targetCallBackAuth: Joi.when('type', {is : "apiKey", then: Joi.string().required()})
+    .when('type', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
+    .when('type', {is : "privateCertificate", then: Joi.string().required()}),
+    targetMno: Joi.string().required().valid('Vodafone', "One_Telecomunications", "Orange", "Telefónia"),
+    targetMnoLocation: Joi.string().required().valid('Ireland', "Czech_Republic", "Greece", "Hungary", "Italy", "Portugal", "Romania", "Spain", "United_Kingdom"),
     targetApiKeyDuration: Joi.number().min(1).max(90).required().messages({
       'number.min': `"api duration key" cannot be less than 1`,
       'number.max': "api key duration cannot be greater than 90",
@@ -85,6 +86,7 @@ exports.post = async (req, res) => {
   console.log(JSON.stringify(req.apiGateway.event, null, 2))
 
   const {
+    type,
     targetEmailAddress,
     targetPhoneNumber,
     targetFirstName,
@@ -114,6 +116,7 @@ exports.post = async (req, res) => {
   }
 
   const preLoginAccount = await customersController.createAccountInvite({
+    type,
     targetEmailAddress,
     targetPhoneNumber,
     targetFirstName,
@@ -156,14 +159,14 @@ exports.put = async (req, res) => {
       'string.pattern.base': "valid patterns are (123) 456-7890,(123)456-7890,123-456-7890,123.456.7890,1234567890,+31636363634,075-63546725",
       'any.required': `"phone number" is a required field`
     }),
-
+    Type: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
     Mfa: Joi.boolean().required(),
     CallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
-    CallBackAuth: Joi.string().required().messages({
-      'string.empty': `"callback auth" cannot be an empty field`
-    }),
+    CallBackAuth: Joi.when('Type', {is : "apiKey", then: Joi.string().required()})
+    .when('Type', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
+    .when('Type', {is : "privateCertificate", then: Joi.string().required()}),
     Mno: Joi.string().required().valid('Vodafone', "One Telecomunications", "Orange", "Telefónia"),
     MnoLocation: Joi.string().required().valid('Ireland', "Czech Republic", "Greece", "Hungary", "Italy", "Portugal", "Romania", "Spain", "United Kingdom"),
     ApiKeyDuration: Joi.number().min(1).max(90).required().messages({
