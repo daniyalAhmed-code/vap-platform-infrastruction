@@ -93,3 +93,10 @@ output "API_KEY_AUTHORIZATION_ROLE_ARN" {
 output "API_KEY_AUTHORIZATION_ROLE_NAME" {
   value = aws_iam_role.api_key_authoriser_invocation_role.name
 }
+
+output "SMS_CALLER_ROLE_ARN" {
+  value = aws_iam_role.cognito_sms_caller_role.arn
+}
+output "SMS_CALLER_ROLE_NAME" {
+  value = aws_iam_role.cognito_sms_caller_role.name
+}

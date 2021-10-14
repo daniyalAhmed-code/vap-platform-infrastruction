@@ -75,6 +75,7 @@ module "policy" {
   API_KEY_AUTHORIZATION_LAMBDA_ARN                     = module.lambda.API_KEY_AUTHORIZATION_LAMBDA_ARN
   API_KEY_AUTHORIZATION_ROLE_NAME                      = module.role.API_KEY_AUTHORIZATION_ROLE_NAME
   CATALOG_UPDATER_LAMBDA_ARN                           = module.lambda.CATALOG_UPDATER_LAMBDA_ARN
+  COGNITO_SMS_CALLER_ROLE_NAME                         = module.role.SMS_CALLER_ROLE_NAME
 }
 
 module "lambda" {
@@ -180,6 +181,7 @@ module "cognito" {
   COGNITO_REGISTERED_GROUP_ROLE_ARN = module.role.COGNITO_REGISTERED_GROUP_ROLE_ARN
   COGNITO_ADMIN_GROUP_ROLE_ARN      = module.role.COGNITO_ADMIN_GROUP_ROLE_ARN
   # BUCEKT_REGIONAL_DOMAIN_NAME = var.BUCKET_REGIONAL_NAME
+  COGNITO_SMS_CALLER_ROLE           = module.role.SMS_CALLER_ROLE_NAME
 }
 
 module "policy_invoke_lambda" {
